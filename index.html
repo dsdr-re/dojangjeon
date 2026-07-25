@@ -54,6 +54,27 @@
   .site-nav button:hover{ background:var(--site-brand-tint); color:var(--site-brand); }
   .site-nav button.active{ background:var(--site-brand); color:#fff; }
 
+  /* ── 모바일: 헤더 높이 고정 해제 + 내비 가로 스크롤 ── */
+  @media (max-width:760px){
+    .site-header-inner{
+      height:auto; flex-direction:column; align-items:stretch;
+      gap:0; padding:10px 14px 0;
+    }
+    .site-logo{ align-self:flex-start; }
+    .site-logo img{ width:26px; height:26px; }
+    .site-logo span{ font-size:16px; }
+    .site-nav{
+      flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin-top:8px; padding-bottom:8px;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .site-nav::-webkit-scrollbar{ display:none; }
+    .site-nav button{
+      flex:0 0 auto; white-space:nowrap; font-size:13.5px; padding:8px 12px;
+    }
+    .site-main{ padding:0 16px 72px; }
+  }
+
   /* ── 페이지 레이아웃 / 화면 전환 (신규) ── */
   .site-main{ max-width:var(--site-max-w); margin:0 auto; padding:0 24px 96px; }
   .view{ display:none; }
@@ -162,7 +183,12 @@
   }.app-stats .chips {display:flex; flex-wrap:wrap; gap:6px}.app-stats .chip {
     font-size:12.5px; padding:6px 12px; border-radius:20px; border:1px solid var(--line);
     background:#f5f6f7; color:var(--sub); cursor:pointer; user-select:none; transition:.12s;
-  }.app-stats .chip.active {background:var(--accent); color:#fff; border-color:var(--accent)}.app-stats .more-link {font-size:12px; color:var(--accent); cursor:pointer; text-decoration:underline; background:none; border:none; padding:0}.app-stats .stats-row {display:flex; gap:12px; margin-bottom:14px}.app-stats .stat-card {flex:1; border-radius:10px; padding:14px 16px}.app-stats .stat-card.blue {background:var(--accent-bg)}.app-stats .stat-card.warn {background:var(--warn-bg)}.app-stats .stat-label {font-size:12px}.app-stats .stat-value {font-size:22px; font-weight:700; margin-top:2px}.app-stats .stat-sub {font-size:11px; margin-top:2px; opacity:.85}.ref-list {list-style:none; margin:10px 0 0; padding:0}
+  }.app-stats .chip.active {background:var(--accent); color:#fff; border-color:var(--accent)}.app-stats .more-link {font-size:12px; color:var(--accent); cursor:pointer; text-decoration:underline; background:none; border:none; padding:0}.app-stats .stats-row {display:flex; gap:12px; margin-bottom:14px}.app-stats .stat-card {flex:1; border-radius:10px; padding:14px 16px}.app-stats .stat-card.blue {background:var(--accent-bg)}.app-stats .stat-card.warn {background:var(--warn-bg)}.app-stats .stat-label {font-size:12px}.app-stats .stat-value {font-size:22px; font-weight:700; margin-top:2px}.app-stats .stat-sub {font-size:11px; margin-top:2px; opacity:.85}@media (max-width:760px){
+  .app-stats .wrap{ padding:20px 14px 60px; }
+  .app-stats #heatmap table{ min-width:420px; }
+  .app-stats .stat-value{ font-size:20px; }
+ }
+.ref-list {list-style:none; margin:10px 0 0; padding:0}
  .ref-list li {display:flex; align-items:baseline; justify-content:space-between;
    gap:12px; padding:11px 2px; border-bottom:1px solid rgba(0,0,0,.06)}
  .ref-list li:last-child {border-bottom:none}
@@ -565,7 +591,7 @@
         </div>
       </div>
     </div>
-    <div id="heatmap"></div>
+    <div id="heatmap" style="overflow-x:auto; -webkit-overflow-scrolling:touch"></div>
     <div class="note">다가구주택은 건물 전체 등기 특성상 전세가율이 왜곡되어(중앙값 14.6%) 참고하지 않는 것을 권장합니다. 비율은 <b>"이 유형의 사고 중 몇 %가 이 구간에서 났는지"</b>를 보여줍니다. 이 지표는 사고 표본 내 상대적 쏠림이며, 전체 계약건수(분모)를 반영한 실제 사고 발생률은 아닙니다.</div>
   </div>
 
