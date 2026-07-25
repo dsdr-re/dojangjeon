@@ -355,11 +355,17 @@
   .app-stats .gap-badge.gap-up{ background:var(--red-bg); color:var(--red); }
   .app-stats .gap-badge.gap-down{ background:#f1f2f4; color:var(--muted); }
   .app-stats .gap-badge.gap-flat{ background:#f1f2f4; color:var(--sub); }
-  .app-stats .flag-summary{
-    font-size:12.5px; color:var(--sub); background:var(--accent-bg); border-radius:10px;
-    padding:10px 12px; margin-bottom:14px; font-weight:600;
+  .app-stats .stat-note-warn{
+    background:var(--warn-bg); color:#8a5a00; border-radius:10px;
+    padding:11px 13px; margin:-4px 0 14px; font-size:12.5px;
+    font-weight:600; line-height:1.6;
   }
-  .app-stats .flag-summary b{ color:var(--accent); }
+  .app-stats .insight-head{ font-size:13px; font-weight:700; line-height:1.6; }
+  .app-stats .insight-head b{ font-weight:800; }
+  .app-stats .insight-how{ margin-top:8px; padding-top:8px;
+    border-top:1px solid rgba(0,0,0,.08);
+    font-size:12.5px; font-weight:500; line-height:1.65; opacity:.92;
+  }
 
 
 </style>
@@ -575,6 +581,7 @@
       <div class="stat-value" style="color:var(--warn)" id="counsel-n">-</div>
     </div>
   </div>
+  <div id="dagagu-stat-note"></div>
 
   <div class="panel">
     <h2>HUG 사고 통계</h2>
@@ -603,7 +610,7 @@
     <div id="counsel-body"></div>
   </div>
 
-  <div class="panel" id="insight-panel" style="display:none">
+  <div class="panel" id="insight-panel">
     <h2>이 통계로 확인할 것</h2>
     <div class="insight" id="insight-text"></div>
   </div>
@@ -1187,6 +1194,19 @@ function renderHeatmap(){
   document.getElementById('heatmap').innerHTML = html;
 }
 
+/* 위험요소별 확인 방법 — 진단 문항의 안내와 동일한 문구.
+   '깡통·역전세'는 전세가율 계산으로 다루는 항목이라 별도 작성. */
+const FLAG_HOWTO = {
+  "후순위":"전입 세대는 전입세대열람원, 앞선 보증금 액수는 확정일자 부여현황, 공동담보 여부는 등기부 '을구' 공동담보목록에서 확인하세요.",
+  "선순위조세압류":"등기부 '갑구'에서 '압류'·'가압류' 표시를 확인하고, 국세 완납증명서로도 확인하세요.",
+  "소유권변경":"등기부 '갑구'에서 소유권 이전 시점과 새 소유자를 확인하세요.",
+  "신탁부동산":"등기부 '갑구'에서 신탁등기를 확인하고, 신탁원부를 열람해 임대 권한이 누구에게 있는지 확인하세요.",
+  "임대인본인성불투명":"등기부상 소유자와 계약 상대가 같은지 대조하고, 대리인이라면 위임장을 확인하세요.",
+  "계약구조조작":"실제와 다른 금액(다운계약), 계약서 이중 작성, 보증금 일부를 차용증으로 분리하는 요구가 있는지 확인하세요.",
+  "깡통·역전세":"실거래가·공시가격으로 시세를 다시 확인하고, 보증금과 선순위 채권의 합을 시세와 비교하세요."
+};
+const INSIGHT_GAP = 10;   // 전체 평균 대비 이만큼(%p) 이상 높을 때 특정 신호를 지목
+
 function renderCounselBody(rows){
   const n = rows.length;
   let html = '';
@@ -1199,13 +1219,11 @@ function renderCounselBody(rows){
       const base = DATA.overallFlag[k];
       return { k, rate, base, gap: rate-base };
     });
+    // 지목 대상은 '차이(gap)'가 가장 큰 신호. 막대 목록은 기존대로 전체 평균순으로 표시.
+    const top = flagData.reduce((a,b)=> b.gap > a.gap ? b : a);
     flagData.sort((a,b)=> b.base - a.base);
-    const top = flagData[0];
 
     let flagHtml = '';
-    if(top.gap > 5){
-      flagHtml += `<div class="flag-summary">이 조건은 <b>'${top.k}'</b> 신호가 전체 평균보다 <b>${top.gap.toFixed(1)}%p 높게</b> 나타나요. 계약 전 이 항목부터 확인해보세요.</div>`;
-    }
     flagData.forEach(item=>{
       const gapLabel = (item.gap>=0?'+':'') + item.gap.toFixed(1) + '%p';
       const gapClass = item.gap > 5 ? 'gap-up' : (item.gap < -5 ? 'gap-down' : 'gap-flat');
@@ -1236,14 +1254,26 @@ function renderCounselBody(rows){
 
     html = `<div style="font-size:12.5px; font-weight:700; margin-bottom:8px; color:var(--sub)">위험요소 출현비율 (선택한 조건 vs 전체 평균)</div>` + flagHtml + dispHtml;
 
-    if(top.gap > 5){
-      document.getElementById('insight-panel').style.display='block';
-      document.getElementById('insight-text').textContent = `이 조건은 '${top.k}' 신호가 전체 평균 대비 ${top.gap.toFixed(1)}%p 높게 나타납니다. 계약 전 해당 항목을 우선 확인해보세요.`;
+    document.getElementById('insight-panel').style.display='block';
+    const box = document.getElementById('insight-text');
+    if(top.gap > INSIGHT_GAP){
+      box.innerHTML = `<div class="insight-head">이 조건은 <b>'${top.k}'</b> 신호가 전체 평균보다 <b>${top.gap.toFixed(1)}%p 높게</b> 나타납니다.</div>`
+        + `<div class="insight-how">${FLAG_HOWTO[top.k] || ''}</div>`;
     } else {
-      document.getElementById('insight-panel').style.display='none';
+      box.innerHTML = `<div class="insight-head">이 조건의 위험요소 분포는 전체 평균과 비슷합니다.</div>`
+        + `<div class="insight-how">특정 항목이 두드러지지 않으므로, 진단에서 7개 항목을 모두 확인해보세요.</div>`;
     }
   }
   document.getElementById('counsel-body').innerHTML = html;
+}
+
+function renderDagaguStatNote(){
+  const box = document.getElementById('dagagu-stat-note');
+  if(!box) return;
+  const on = typesArr().includes('다가구') && state.types.size > 0;
+  box.innerHTML = on
+    ? `<div class="stat-note-warn">다가구는 보증보험 가입이 어려워 HUG 데이터에 적게 잡힙니다. 사고가 드물어서가 아닙니다.</div>`
+    : '';
 }
 
 function renderJeonse(){
@@ -1273,6 +1303,7 @@ function renderAll(){
   const rows = DATA.counsel.filter(matchCounsel);
   document.getElementById('counsel-n').textContent = fmt(rows.length)+'건';
   renderJeonse();
+  renderDagaguStatNote();
   renderHeatmap();
   renderCounselBody(rows);
 }
