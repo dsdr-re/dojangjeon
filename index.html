@@ -188,17 +188,20 @@
   .app-stats #heatmap table{ min-width:420px; }
   .app-stats .stat-value{ font-size:20px; }
  }
-.ref-list {list-style:none; margin:10px 0 0; padding:0}
- .ref-list li {display:flex; align-items:baseline; justify-content:space-between;
-   gap:12px; padding:11px 2px; border-bottom:1px solid rgba(0,0,0,.06)}
- .ref-list li:last-child {border-bottom:none}
- .ref-org {font-size:14px; font-weight:600; color:#333}
- .ref-dom {font-size:12.5px; color:var(--sub); font-family:ui-monospace,'SF Mono',Menlo,monospace}
-.quicklinks-hug {margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08)}
- .quicklinks-hug a {display:inline-block; font-size:13px; font-weight:700;
-   color:var(--accent); text-decoration:none}
- .quicklinks-hug a:hover {text-decoration:underline}
- .quicklinks-hug p {font-size:12px; color:var(--sub); margin:6px 0 0; line-height:1.6}
+.ref-list {list-style:none; margin:0; padding:16px 17px;
+   background:var(--bg-sub); border-radius:var(--r-md)}
+ .ref-list li {display:flex; align-items:baseline; gap:12px;
+   padding:10px 0; border-bottom:1px solid rgba(0,0,0,.06)}
+ .ref-list li:first-child {padding-top:0}
+ .ref-list li:last-child {padding-bottom:0; border-bottom:none}
+ .ref-org {flex:1 1 auto; font-size:14px; font-weight:600; color:#333}
+ .ref-dom {flex:0 0 auto; text-align:right; font-size:12.5px; color:var(--sub);
+   font-family:ui-monospace,'SF Mono',Menlo,monospace; font-variant-numeric:tabular-nums}
+ @media (max-width:520px){
+   .ref-list li{flex-direction:column; align-items:flex-start; gap:2px}
+   .ref-dom{text-align:left}
+ }
+.quicklinks-note {font-size:11.5px; color:var(--ink-soft); margin:9px 0 0; line-height:1.6;}
 .dagagu-alert {background:#fff8e6; border:1.5px solid #f0b429; border-radius:12px;
    padding:14px 16px; margin-top:10px; animation:dgFade .25s ease}
  .dagagu-alert h4 {font-size:13.5px; font-weight:800; color:#8a5a00; margin:0 0 8px}
@@ -289,24 +292,24 @@
   /* ── [수정3] 진단 결과: 팝업이 아닌 완전한 화면 + 좌(리스트)·우(요약) 2단 배치, 우측은 스크롤에 따라옴 ── */
   #view-result .app-dojang{ max-width:1080px; margin:0 auto; }
   #view-result .result-layout{
-    display:grid; grid-template-columns:1fr 300px; gap:16px 48px;
+    display:grid; grid-template-columns:1fr; gap:16px;
     padding:24px 0 70px; align-items:start;
+    max-width:560px; margin:0 auto;
   }
   #view-result .result-back{
-    grid-column:1/-1; justify-self:start; background:none; border:none; cursor:pointer;
+    grid-column:1; order:0; justify-self:start; background:none; border:none; cursor:pointer;
     color:var(--ink-soft); font-size:13px; font-weight:700; padding:6px 0 4px; display:flex; align-items:center; gap:4px;
   }
   #view-result .result-back:hover{ color:var(--brand-deep); }
-  #view-result .result-main{ grid-column:1; }
+  #view-result .result-main{ grid-column:1; order:2; }
   #view-result .result-side{
-    grid-column:2; position:sticky; top:calc(var(--site-nav-h) + 24px);
+    grid-column:1; order:1; position:static;
     display:flex; flex-direction:column; gap:14px;
     background:var(--bg-sub); border-radius:20px; padding:22px 20px;
   }
-  #view-result .result-disclaimer{ grid-column:1/-1; margin-top:8px; }
+  #view-result .result-disclaimer{ grid-column:1; order:3; margin-top:8px; }
   @media (max-width:860px){
-    #view-result .result-layout{ grid-template-columns:1fr; }
-    #view-result .result-side{ position:static; }
+    #view-result .result-side{ padding:18px 15px; }
   }
   /* 도장 스테이지: 문서 목업 없이 원(도장)만 중앙에 크게 */
   #view-result .stamp-stage{ position:relative; height:190px; display:flex; align-items:center; justify-content:center; margin-bottom:0; }
@@ -564,7 +567,7 @@
 
   <div class="stats-row">
     <div class="stat-card blue">
-      <div class="stat-label" style="color:var(--accent)">HUG 사고 건수</div>
+      <div class="stat-label" style="color:var(--accent)">HUG 임대보증 사고 건수</div>
       <div class="stat-value" style="color:var(--accent)" id="hug-n">-</div>
     </div>
     <div class="stat-card warn">
@@ -592,7 +595,7 @@
       </div>
     </div>
     <div id="heatmap" style="overflow-x:auto; -webkit-overflow-scrolling:touch"></div>
-    <div class="note">다가구주택은 건물 전체 등기 특성상 전세가율이 왜곡되어(중앙값 14.6%) 참고하지 않는 것을 권장합니다. 비율은 <b>"이 유형의 사고 중 몇 %가 이 구간에서 났는지"</b>를 보여줍니다. 이 지표는 사고 표본 내 상대적 쏠림이며, 전체 계약건수(분모)를 반영한 실제 사고 발생률은 아닙니다.</div>
+    <div class="note">이 표는 임대보증금보증 사고 기준이라 등록임대주택만 포함하니 참고 바랍니다. 다가구주택은 건물 전체 등기 특성상 전세가율이 왜곡되어 참고하지 않는 것을 권장합니다. 비율은 <b>"이 유형의 사고 중 몇 %가 이 구간에서 났는지"</b>를 보여주며, 사고 표본 내 상대적 쏠림일 뿐 전체 계약건수(분모)를 반영한 실제 사고 발생률은 아닙니다.</div>
   </div>
 
   <div class="panel">
@@ -1013,11 +1016,9 @@ function openResult(){
       <a href="https://www.iros.go.kr" target="_blank" rel="noopener">등기부등본↗</a>
       <a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12100000283" target="_blank" rel="noopener">미납국세↗</a>
       <a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000305" target="_blank" rel="noopener">전입세대확인서↗</a>
+      <a href="https://khig.khug.or.kr/index.jsp?fromLink=Y&amp;MENUID=200800" target="_blank" rel="noopener">반환보증 가입여부↗</a>
     </div>
-    <div class="quicklinks-hug">
-      <a href="https://khig.khug.or.kr/index.jsp?fromLink=Y&amp;MENUID=200800" target="_blank" rel="noopener">🔗 전세보증금반환보증 가입 가능여부 확인하기</a>
-      <p>가입이 안 되는 집이라면, 그 이유가 곧 위험 신호예요.</p>
-    </div>
+    <p class="quicklinks-note">반환보증 가입이 안 되는 집이라면, 그 이유가 곧 위험 신호예요.</p>
   </div>`;
 }
 function closeResult(){ siteShowView('check'); }
